@@ -2,5 +2,8 @@
   "name": "atlas-desk",
   "version": "2.3.0",
   "private": true,
-  "description": "Atlas Desk 2.3 — market-structure command center. Not a broker."
+  "description": "Atlas Desk 2.3 — market-structure command center. Not a broker.",
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.14"
+  }
 }
