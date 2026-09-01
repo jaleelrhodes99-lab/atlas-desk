@@ -78,6 +78,10 @@
   </main>
   <footer>Atlas is a map. AEGIS is the gate. Neither is a broker.</footer>
   <script>
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+  <script>
     fetch("/api/health").then(r => r.json()).then(j => {
       const el = document.getElementById("status");
       const fine = j.ok && j.version === "atlas-2.3.0" && j.watch === "24/7";
