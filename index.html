@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Atlas Desk 2.3</title>
+  <style>
+    :root { color-scheme: dark; --bg:#070b16; --panel:#10182c; --line:#2a365c; --ink:#e8edf7; --mut:#93a0bb; --ok:#7dffa6; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+    header { display:flex; justify-content:space-between; align-items:flex-end; padding:22px 28px; border-bottom:1px solid var(--line); }
+    h1 { margin:0; letter-spacing:.08em; font-size:22px; }
+    .sub { color:var(--mut); font-size:13px; margin-top:4px; }
+    .status { text-align:right; font-size:13px; }
+    .ok { color:var(--ok); font-weight:700; }
+    main { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; padding:22px 28px 40px; }
+    article { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+    h2 { margin:0 0 8px; font-size:15px; }
+    p, li { color:var(--mut); font-size:14px; line-height:1.45; }
+    code { font-family:ui-monospace,monospace; font-size:12px; }
+    ul { margin:8px 0 0; padding-left:18px; }
+    footer { padding:0 28px 28px; color:var(--mut); font-size:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>ATLAS DESK</h1>
+      <div class="sub">Engine atlas-2.3.0 · structure only · never a broker</div>
+    </div>
+    <div class="status" id="status">checking health…</div>
+  </header>
+  <main>
+    <article>
+      <h2>Watch</h2>
+      <p>24/7 sentinel checks <code>/api/health</code>. Expected: version atlas-2.3.0, ok true, watch 24/7.</p>
+    </article>
+    <article>
+      <h2>Guard (hard blocks)</h2>
+      <ul>
+        <li>No gold sells at demand</li>
+        <li>No JPY dumps without CHoCH</li>
+        <li>2.00 lot cap</li>
+        <li>No averaging</li>
+        <li>No chasing a just-hit TP</li>
+      </ul>
+    </article>
+    <article>
+      <h2>AEGIS perimeter</h2>
+      <p>Unknown principals cannot run protect/kill. Policy engine stays on. Audit chain is hash-linked. This desk does not place trades.</p>
+    </article>
+    <article>
+      <h2>Navigate</h2>
+      <ul>
+        <li><code>/api/health</code> — live posture</li>
+        <li><code>guard.json</code> — playbook blocks</li>
+        <li>GitHub <code>jaleelrhodes99-lab/atlas-desk</code></li>
+      </ul>
+    </article>
+  </main>
+  <footer>Atlas is a map. AEGIS is the gate. Neither is a broker.</footer>
+  <script>
+    fetch("/api/health").then(r => r.json()).then(j => {
+      const el = document.getElementById("status");
+      const fine = j.ok && j.version === "atlas-2.3.0" && j.watch === "24/7";
+      el.innerHTML = fine
+        ? `<span class="ok">SECURE</span><br>${j.version} · threat ${j.threat}`
+        : `HOLD<br>${JSON.stringify(j)}`;
+    }).catch(() => {
+      document.getElementById("status").textContent = "HOLD — health unreachable";
+    });
+  </script>
+</body>
+</html>
