@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Atlas Desk 2.3</title>
   <style>
-    :root { color-scheme: dark; --bg:#070b16; --panel:#10182c; --line:#2a365c; --ink:#e8edf7; --mut:#93a0bb; --ok:#7dffa6; }
+    :root { color-scheme: dark; --bg:#070b16; --panel:#10182c; --line:#2a365c; --ink:#e8edf7; --mut:#93a0bb; --ok:#7dffa6; --hold:#ffd27d; }
     * { box-sizing: border-box; }
     body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:var(--bg); color:var(--ink); }
     header { display:flex; justify-content:space-between; align-items:flex-end; padding:22px 28px; border-bottom:1px solid var(--line); }
@@ -13,6 +13,7 @@
     .sub { color:var(--mut); font-size:13px; margin-top:4px; }
     .status { text-align:right; font-size:13px; }
     .ok { color:var(--ok); font-weight:700; }
+    .hold { color:var(--hold); font-weight:700; }
     main { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; padding:22px 28px 40px; }
     article { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
     h2 { margin:0 0 8px; font-size:15px; }
@@ -20,6 +21,14 @@
     code { font-family:ui-monospace,monospace; font-size:12px; }
     ul { margin:8px 0 0; padding-left:18px; }
     footer { padding:0 28px 28px; color:var(--mut); font-size:12px; }
+    button {
+      margin-top:10px; background:#1b2744; color:var(--ink); border:1px solid var(--line);
+      border-radius:8px; padding:8px 10px; cursor:pointer;
+    }
+    input {
+      width:100%; margin-top:8px; background:#0b1222; color:var(--ink);
+      border:1px solid var(--line); border-radius:8px; padding:8px;
+    }
   </style>
 </head>
 <body>
@@ -50,9 +59,18 @@
       <p>Unknown principals cannot run protect/kill. Policy engine stays on. Audit chain is hash-linked. This desk does not place trades.</p>
     </article>
     <article>
+      <h2>Memory Cloud</h2>
+      <p id="mem-status">checking plugin…</p>
+      <input id="mem-query" placeholder="recall query or note to write" />
+      <button type="button" id="mem-recall">Recall</button>
+      <button type="button" id="mem-write">Write</button>
+      <p id="mem-out"></p>
+    </article>
+    <article>
       <h2>Navigate</h2>
       <ul>
         <li><code>/api/health</code> — live posture</li>
+        <li><code>/api/memory</code> — Memory Cloud plugin</li>
         <li><code>guard.json</code> — playbook blocks</li>
         <li>GitHub <code>jaleelrhodes99-lab/atlas-desk</code></li>
       </ul>
@@ -69,6 +87,33 @@
     }).catch(() => {
       document.getElementById("status").textContent = "HOLD — health unreachable";
     });
+
+    const memStatus = document.getElementById("mem-status");
+    const memOut = document.getElementById("mem-out");
+    fetch("/api/memory").then(r => r.json()).then(j => {
+      memStatus.innerHTML = j.plugin && j.plugin.connected
+        ? `<span class="ok">CONNECTED</span> · mem0 · ${j.plugin.user_id}`
+        : `<span class="hold">NOT CONNECTED</span> · set MEM0_API_KEY`;
+    }).catch(() => {
+      memStatus.textContent = "plugin unreachable";
+    });
+
+    async function memoryAction(action) {
+      const text = document.getElementById("mem-query").value.trim();
+      const payload = action === "write"
+        ? { action, text }
+        : { action, query: text || "atlas desk structure" };
+      memOut.textContent = "calling memory cloud…";
+      const r = await fetch("/api/memory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const j = await r.json();
+      memOut.textContent = JSON.stringify(j, null, 2).slice(0, 800);
+    }
+    document.getElementById("mem-recall").onclick = () => memoryAction("recall");
+    document.getElementById("mem-write").onclick = () => memoryAction("write");
   </script>
 </body>
 </html>

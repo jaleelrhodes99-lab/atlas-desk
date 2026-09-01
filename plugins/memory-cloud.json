@@ -1,0 +1,13 @@
+{
+  "id": "memory-cloud",
+  "name": "Memory Cloud",
+  "provider": "mem0",
+  "version": "1.0.0",
+  "engine": "atlas-2.3.0",
+  "broker": false,
+  "endpoint": "/api/memory",
+  "cloud": "https://api.mem0.ai/v1",
+  "env": ["MEM0_API_KEY", "MEM0_USER_ID"],
+  "actions": ["status", "recall", "write"],
+  "notes": "Cloud memory only. Does not place trades. Hard blocks stay in guard.json."
+}
