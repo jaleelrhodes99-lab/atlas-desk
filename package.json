@@ -2,5 +2,14 @@
   "name": "atlas-desk",
   "version": "2.3.0",
   "private": true,
-  "description": "Atlas Desk 2.3 — market-structure command center. Not a broker."
+  "description": "Atlas Desk 2.3 — market-structure command center. Not a broker.",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "dev": "npx serve .",
+    "lint": "echo 'No linter configured'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
 }
