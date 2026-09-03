@@ -1,12 +1,22 @@
-# Atlas Desk 2.3
+# Atlas Desk 2.4
 
 Market-structure command center for Jaleel Rhodes.
 
 This is a **structure desk**, not a broker. It never places trades.
 
+## Live
+
+https://atlas-desk-gamma.vercel.app
+
+## 2.4 surfaces
+
+- Screenshot drop box (local only — drop / paste / pick)
+- Entry · TP · SL signal board with R:R and hard-block checks
+- Add to Home Screen (PWA + iOS Safari instructions)
+
 ## Live contract
 
-`GET /api/health` must return `ok: true`, `version: atlas-2.3.0`, `watch: 24/7`.
+`GET /api/health` must return `ok: true`, `version: atlas-2.4.0`, `watch: 24/7`.
 
 ## Memory Cloud plugin
 

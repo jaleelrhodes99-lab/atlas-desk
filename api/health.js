@@ -3,12 +3,17 @@ module.exports = (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
     ok: true,
-    version: "atlas-2.3.0",
-    engine: "atlas-2.3.0",
+    version: "atlas-2.4.0",
+    engine: "atlas-2.4.0",
     watch: "24/7",
     desk: "atlas",
     broker: false,
     threat: "nominal",
+    features: {
+      screenshot_dropbox: true,
+      entry_tp_sl: true,
+      add_to_home_screen: true,
+    },
     guard: {
       no_gold_sells_at_demand: true,
       no_jpy_dumps_without_choch: true,

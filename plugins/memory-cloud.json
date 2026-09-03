@@ -3,7 +3,7 @@
   "name": "Memory Cloud",
   "provider": "mem0",
   "version": "1.0.1",
-  "engine": "atlas-2.3.0",
+  "engine": "atlas-2.4.0",
   "broker": false,
   "endpoint": "/api/memory",
   "cloud": "https://api.mem0.ai/v1",
