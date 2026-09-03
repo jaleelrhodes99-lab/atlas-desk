@@ -5,240 +5,111 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#070b16"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="Atlas Control"/>
   <link rel="manifest" href="/manifest.json"/>
   <link rel="icon" href="/icon.svg" type="image/svg+xml"/>
   <title>Atlas Control</title>
   <style>
     :root { color-scheme:dark; --bg:#070b16; --panel:#10182c; --line:#2a365c; --ink:#e8edf7; --mut:#93a0bb; --ok:#7dffa6; --hold:#ffd27d; --bad:#ff7d8a; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--ink); }
+    * { box-sizing:border-box; } body { margin:0; font-family:ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--ink); }
     header { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(7,11,22,.94); z-index:6; }
-    h1 { margin:0; font-size:18px; letter-spacing:.1em; }
-    .sub { color:var(--mut); font-size:12px; }
-    a { color:#8ec8ff; }
-    .ok { color:var(--ok); font-weight:700; } .hold { color:var(--hold); font-weight:700; } .bad { color:var(--bad); }
+    h1 { margin:0; font-size:18px; letter-spacing:.1em; } .sub { color:var(--mut); font-size:12px; } a { color:#8ec8ff; }
+    .ok { color:var(--ok); font-weight:700; } .hold { color:var(--hold); font-weight:700; } .fail { color:var(--bad); } .pass { color:var(--ok); }
     .wrap { padding:16px 18px 40px; display:grid; grid-template-columns:1.25fr .75fr; gap:14px; }
     @media(max-width:1100px){ .wrap { grid-template-columns:1fr; } }
     article { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px; }
     h2 { margin:0 0 10px; font-size:13px; letter-spacing:.05em; text-transform:uppercase; }
-    p,li,label,small { color:var(--mut); font-size:13px; line-height:1.45; }
+    p,label,small { color:var(--mut); font-size:13px; line-height:1.45; }
     input,textarea,select,button { width:100%; background:#0b1222; color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px; font:inherit; }
-    button { cursor:pointer; font-weight:650; }
-    button.primary { background:#16301f; border-color:#2d6a45; color:var(--ok); }
-    button.danger { background:#2a1218; border-color:#6a2d3a; color:var(--bad); }
-    .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
-    .chips button { width:auto; padding:6px 9px; font-size:12px; }
+    button { cursor:pointer; font-weight:650; } button.primary { background:#16301f; border-color:#2d6a45; color:var(--ok); } button.danger { background:#2a1218; border-color:#6a2d3a; color:var(--bad); }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; } .chips button { width:auto; padding:6px 9px; font-size:12px; }
     .card { border:1px solid var(--line); border-radius:12px; padding:10px; background:#0b1222; margin-top:8px; }
-    .kv { display:grid; grid-template-columns: 1fr auto; gap:4px 10px; font-family:ui-monospace,monospace; font-size:12px; }
-    .kv span:nth-child(odd){ color:var(--mut); }
-    .pass { color:var(--ok); } .fail { color:var(--bad); }
-    .pipe { display:flex; flex-direction:column; gap:4px; }
-    .step { display:flex; justify-content:space-between; gap:8px; font-size:12px; padding:6px 8px; border:1px solid var(--line); border-radius:8px; }
+    .kv { display:grid; grid-template-columns:1fr auto; gap:4px 10px; font-family:ui-monospace,monospace; font-size:12px; }
+    .pipe { display:flex; flex-direction:column; gap:4px; } .step { display:flex; justify-content:space-between; gap:8px; font-size:12px; padding:6px 8px; border:1px solid var(--line); border-radius:8px; }
     .drop { border:1.5px dashed var(--line); border-radius:12px; min-height:140px; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; }
-    .drop.hot { border-color:var(--ok); }
     canvas { width:100%; max-height:280px; background:#000; border-radius:10px; }
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    @media(max-width:640px){ .row { grid-template-columns:1fr; } }
-    .agents { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .agents div { border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:8px; } @media(max-width:640px){ .row { grid-template-columns:1fr; } }
+    .agents { display:grid; grid-template-columns:1fr 1fr; gap:8px; } .agents div { border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12px; }
   </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>CONTROL DESK</h1>
-    <div class="sub">Category A · atlas-3.0.0 · dataset lab · SEND denied</div>
-  </div>
-  <div style="text-align:right">
-    <div id="st">checking…</div>
-    <div class="sub"><a href="/">Hub</a> · <a href="/security.html">Security desk</a></div>
-  </div>
+  <div><h1>CONTROL DESK</h1><div class="sub">Category A · atlas-3.1.0 · operator fills · SEND denied</div></div>
+  <div style="text-align:right"><div id="st">checking…</div><div class="sub"><a href="/">Hub</a> · <a href="/security">Security desk</a></div></div>
 </header>
 <div class="wrap">
-  <div>
-    <article>
-      <h2>Talk to the lab</h2>
-      <p>Say it like you would say it to me. The desk maps language to gates. It does not place trades.</p>
-      <div class="chips" id="chips"></div>
-      <textarea id="cmd" rows="2" placeholder="Find today's highest-quality setups."></textarea>
-      <div class="row" style="margin-top:8px">
-        <button class="primary" id="go" type="button">Run command</button>
-        <button id="stop" class="danger" type="button">Stop trading</button>
-      </div>
-      <div id="reply" class="card" style="display:none"></div>
-    </article>
-    <article>
-      <h2>Setup cards</h2>
-      <p>Rule: score ≥ 85 · R:R ≥ 2.0 · spread ok · no high-impact news · daily loss not hit. Else DO NOTHING.</p>
-      <div id="cards">Run a scan or quality command.</div>
-    </article>
-    <article>
-      <h2>Screenshot box · mark structure</h2>
-      <p>Drop or paste a chart. Tap to cycle: swing high → swing low → entry → SL → TP. Levels stay on this device.</p>
-      <div class="drop" id="drop">Drop chart · tap to pick · paste</div>
-      <input id="file" type="file" accept="image/*" hidden/>
-      <canvas id="cv" hidden></canvas>
-      <div class="chips">
-        <button type="button" data-mark="high">High</button>
-        <button type="button" data-mark="low">Low</button>
-        <button type="button" data-mark="entry">Entry</button>
-        <button type="button" data-mark="sl">SL</button>
-        <button type="button" data-mark="tp">TP</button>
-        <button type="button" id="clr-marks">Clear marks</button>
-      </div>
-      <div class="row">
-        <div><label>Pair</label><input id="mpair" placeholder="EURUSD"/></div>
-        <div><label>Price at mark</label><input id="mprice" inputmode="decimal" placeholder="optional"/></div>
-      </div>
-      <div id="mlevels" class="kv" style="margin-top:8px"></div>
-    </article>
-  </div>
-  <div>
-    <article>
-      <h2>Order pipeline</h2>
-      <p>Failure is contained here. SEND is always denied.</p>
-      <div class="pipe" id="pipe"></div>
-    </article>
-    <article>
-      <h2>Promotion stages</h2>
-      <p>Learn datasets. Do not promote a fit as a market law. 6–7 locked.</p>
-      <div id="stages"></div>
-      <button type="button" id="sim" style="margin-top:8px">Run stages 1–5</button>
-    </article>
-    <article>
-      <h2>Risk rails</h2>
-      <div class="kv" id="riskkv"></div>
-      <div class="row" style="margin-top:8px">
-        <input id="riskin" inputmode="decimal" placeholder="daily %"/>
-        <button type="button" id="riskgo">Set daily limit</button>
-      </div>
-    </article>
-    <article>
-      <h2>Strategies</h2>
-      <div id="strats"></div>
-    </article>
-    <article>
-      <h2>Watch agents</h2>
-      <p>Named jobs on this device. Not 50 live AIs and not a merge with ChatGPT or Claude.</p>
-      <div class="agents">
-        <div><b>Market</b><br>Scanner · Structure · Regime · Reflexivity · Journal · Walk-forward · Monte Carlo · Paper runner</div>
-        <div><b>Security</b><br>Health · Gate · Audit · Kill posture · Memory lock · Lot cap · Duplicate block · Halt</div>
-      </div>
-    </article>
-  </div>
+<div>
+<article>
+  <h2>Talk to the lab</h2>
+  <p>Use this desk every day. Reports come from fills you log. Security stays on the other desk.</p>
+  <div class="chips" id="chips"></div>
+  <textarea id="cmd" rows="2" placeholder="Generate a performance report."></textarea>
+  <div class="row" style="margin-top:8px"><button class="primary" id="go" type="button">Run command</button><button id="stop" class="danger" type="button">Stop trading</button></div>
+  <div id="reply" class="card" style="display:none"></div>
+</article>
+<article>
+  <h2>Operator fills · real report</h2>
+  <p>Line format: <code>YYYY-MM-DD,PAIR,side,entry,sl,exit,strategy</code>. R is computed. Empty book → report withheld.</p>
+  <div class="row"><div><label>Pair</label><input id="fpair" placeholder="EURUSD"/></div><div><label>Side</label><select id="fside"><option>long</option><option>short</option></select></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Entry</label><input id="fentry" inputmode="decimal"/></div><div><label>SL</label><input id="fsl" inputmode="decimal"/></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Exit</label><input id="fexit" inputmode="decimal"/></div><div><label>Strategy</label><input id="fstrat" placeholder="HH/HL trend pullback"/></div></div>
+  <div class="row" style="margin-top:8px"><button class="primary" type="button" id="fadd">Log fill</button><button type="button" id="frun">Generate report</button></div>
+  <textarea id="fpaste" rows="3" style="margin-top:8px" placeholder="2026-09-02,EURUSD,long,1.1700,1.1660,1.1780,HH/HL trend pullback"></textarea>
+  <button type="button" id="fimp" style="margin-top:8px">Import pasted fills</button>
+  <div id="fbook" class="card">No operator fills on this device.</div>
+</article>
+<article>
+  <h2>Setup cards</h2>
+  <p>Rule: score ≥ 85 · R:R ≥ 2.0 · spread ok · no high-impact news · daily loss not hit. Else DO NOTHING.</p>
+  <div id="cards"></div>
+</article>
+<article>
+  <h2>Screenshot box</h2>
+  <p>Drop or paste a chart. Mark High, Low, Entry, SL, TP.</p>
+  <div class="drop" id="drop">Drop chart · tap · paste</div>
+  <input id="file" type="file" accept="image/*" hidden/>
+  <canvas id="cv" hidden></canvas>
+  <div class="chips"><button type="button" data-mark="high">High</button><button type="button" data-mark="low">Low</button><button type="button" data-mark="entry">Entry</button><button type="button" data-mark="sl">SL</button><button type="button" data-mark="tp">TP</button><button type="button" id="clr-marks">Clear</button></div>
+  <div class="row"><input id="mpair" placeholder="EURUSD"/><input id="mprice" placeholder="price at mark"/></div>
+  <div id="mlevels" class="kv" style="margin-top:8px"></div>
+</article>
+</div>
+<div>
+<article><h2>Order pipeline</h2><p>SEND is always denied.</p><div class="pipe" id="pipe"></div></article>
+<article><h2>Promotion stages</h2><p>Lab stages. Book stats come from fills.</p><div id="stages"></div><button type="button" id="sim" style="margin-top:8px">Run stages 1–5</button></article>
+<article><h2>Risk rails</h2><div class="kv" id="riskkv"></div><div class="row" style="margin-top:8px"><input id="riskin" placeholder="daily %"/><button type="button" id="riskgo">Set daily limit</button></div></article>
+<article><h2>Strategies</h2><div id="strats"></div></article>
+<article><h2>Desks</h2><div class="agents"><div><b>Control</b><br>Use every day. Fills · report · structure</div><div><b>Security</b><br>Leave alone unless posture is the question</div></div></article>
+</div>
 </div>
 <script src="/js/atlas-control.js"></script>
 <script>
-const A = window.AtlasControl;
-const $ = (id) => document.getElementById(id);
-const chips = [
-  "Analyze all forex pairs and indices stocks",
-  "Find today's highest-quality setups.",
-  "Backtest this strategy.",
-  "Compare these two strategies.",
-  "Turn strategy #3 off.",
-  "Change the risk limit to 1.5",
-  "Explain why the bot entered.",
-  "Show me today's trades.",
-  "Stop trading.",
-  "Run a new simulation.",
-  "Generate a performance report."
-];
-$("chips").innerHTML = chips.map(c => `<button type="button" data-c="${c.replace(/"/g,'"')}">${c}</button>`).join("");
-$("chips").addEventListener("click", e => {
-  const c = e.target.getAttribute("data-c");
-  if (!c) return;
-  $("cmd").value = c;
-  run();
-});
-function renderRisk() {
-  const r = A.defaultRisk();
-  $("riskkv").innerHTML = `<span>Daily stop</span><span>${r.dailyUsedPct}% / ${r.dailyPct}%</span><span>Weekly cut 50%</span><span>${r.weeklyUsedPct}% / ${r.weeklyPct}%</span><span>Monthly observe</span><span>${r.monthlyUsedPct}% / ${r.monthlyPct}%</span><span>Lot cap</span><span>${r.lotCap}</span><span>Halt</span><span class="${A.halted()?'fail':'pass'}">${A.halted()?'ON':'off'}</span>`;
-}
-function renderStrats() {
-  $("strats").innerHTML = A.strategies().map(s => `<div class="card"><b>#${s.id} ${s.name}</b> · ${s.on?'ON':'OFF'} · ${s.family}</div>`).join("");
-}
-function renderStages(reports) {
-  const list = reports || [1,2,3,4,5,6,7].map(n => A.runStage(n, "desk"));
-  $("stages").innerHTML = list.map(s => `<div class="card"><b>Stage ${s.stage}</b> — ${s.name}<br><span class="${s.pass?'pass':'fail'}">${s.locked?'LOCKED':(s.pass?'PASS':'HOLD')}</span>${s.profitFactor!=null?` · PF ${s.profitFactor} · DD ${s.maxDD}% · n=${s.trades}`:''}<br><small>${s.detail}</small></div>`).join("");
-}
-function renderPipe(setup) {
-  const rows = setup ? A.pipelineFor(setup) : A.PIPE.map(step => ({ step, ok: step !== "SEND ORDER" && step !== "VERIFY EXECUTION" && step !== "VERIFY STOP LOSS", detail: step === "SEND ORDER" ? "DENIED" : "" }));
-  $("pipe").innerHTML = rows.map(r => `<div class="step"><span>${r.step}</span><span class="${r.ok?'pass':'fail'}">${r.ok?'OK':'BLOCK'} ${r.detail||''}</span></div>`).join("");
-}
-function cardHTML(s) {
-  return `<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b>${s.id}</b> <span>${s.name}</span><span class="${s.pass?'pass':'fail'}">${s.pass?'EVALUATE':'DO NOTHING'}</span></div><div class="kv" style="margin-top:8px"><span>Side</span><span>${s.side}</span><span>Trend</span><span>${s.trend}</span><span>Higher timeframe</span><span>${s.higherTimeframe}</span><span>Market structure</span><span>${s.marketStructure}</span><span>Momentum</span><span>${s.momentum}</span><span>Volatility</span><span>${s.volatility}</span><span>Spread</span><span>${s.spread}</span><span>News risk</span><span>${s.newsRisk}</span><span>Entry quality</span><span>${s.entryQuality}/100</span><span>Risk/reward</span><span>${s.riskReward}:1</span><span>Regime</span><span>${s.regime}</span><span>Reflexive</span><span>${s.reflexive?'breakout+volume+sentiment':'no'}</span><span>False-break risk</span><span>${s.falseBreakoutRisk?'yes':'low'}</span></div><small>${s.note}${s.avoid.length? ' · '+s.avoid.join('; '):''}</small><div class="row" style="margin-top:8px"><button type="button" data-pipe="${s.id}">Show gates</button><button type="button" data-paper="${s.id}">Paper intent</button></div></div>`;
-}
-function renderCards(rows) {
-  if (!rows || !rows.length) { $("cards").innerHTML = "<p>No cards.</p>"; return; }
-  $("cards").innerHTML = rows.slice(0, 12).map(cardHTML).join("");
-  window.__rows = rows;
-}
-$("cards").addEventListener("click", e => {
-  const id = e.target.getAttribute("data-pipe") || e.target.getAttribute("data-paper");
-  if (!id) return;
-  const s = (window.__rows||[]).find(x => x.id===id);
-  if (!s) return;
-  if (e.target.getAttribute("data-pipe")) renderPipe(s);
-  if (e.target.getAttribute("data-paper")) {
-    if (!s.pass) { $("reply").style.display="block"; $("reply").textContent="Rule failed. DO NOTHING."; return; }
-    const t = A.addTicket(s, s.id+" "+s.side+" score "+s.entryQuality+" RR "+s.riskReward+" — paper intent only");
-    $("reply").style.display="block"; $("reply").textContent = "Ticket "+t.id+" stored. sent=false.";
-  }
-});
-function run() {
-  const text = $("cmd").value;
-  const res = A.parse(text);
-  A.logCommand(text, res.reply);
-  $("reply").style.display="block";
-  $("reply").textContent = res.reply;
-  if (res.rows && (res.type==="scan"||res.type==="setups")) renderCards(res.rows);
-  if (res.type==="journal") $("reply").textContent = res.reply+"\n"+JSON.stringify(res.rows,null,2);
-  if (res.type==="report"||res.type==="compare") $("reply").textContent = res.reply+"\n"+JSON.stringify(res.rows||{a:res.a,b:res.b},null,2);
-  if (res.type==="stage") renderStages([res.report, A.runStage(6), A.runStage(7)]);
-  if (res.type==="sim") renderStages(res.reports.concat([A.runStage(6), A.runStage(7)]));
-  if (res.type==="strategies") renderStrats();
-  if (res.type==="risk"||res.type==="halt"||res.type==="resume") renderRisk();
-  if (res.type==="explain" && res.ticket) $("reply").textContent = res.reply+"\n"+JSON.stringify(res.ticket,null,2);
-}
-$("go").onclick = run;
-$("cmd").addEventListener("keydown", e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); run(); }});
-$("stop").onclick = () => { $("cmd").value="Stop trading."; run(); };
-$("sim").onclick = () => { $("cmd").value="Run a new simulation."; run(); };
-$("riskgo").onclick = () => { const n = Number($("riskin").value||"1.5"); $("cmd").value = "Change the risk limit to "+n; run(); };
-let img=null, marks=[], mode="high";
-const cv=$("cv"), ctx=cv.getContext("2d");
-document.querySelectorAll("[data-mark]").forEach(b => b.onclick = () => { mode=b.getAttribute("data-mark"); });
-$("clr-marks").onclick = () => { marks=[]; draw(); };
-function draw(){
-  if(!img) return;
-  cv.hidden=false;
-  const w = cv.parentElement.clientWidth-4;
-  const scale = w / img.width;
-  cv.width = w; cv.height = img.height*scale;
-  ctx.drawImage(img,0,0,cv.width,cv.height);
-  const color={high:"#ffd27d",low:"#8ec8ff",entry:"#7dffa6",sl:"#ff7d8a",tp:"#7dffa6"};
-  marks.forEach(m=>{ ctx.strokeStyle=color[m.k]||"#fff"; ctx.beginPath(); ctx.moveTo(0,m.y); ctx.lineTo(cv.width,m.y); ctx.stroke(); ctx.fillStyle=color[m.k]||"#fff"; ctx.fillText(m.k.toUpperCase()+(m.px?(" "+m.px):""), 8, Math.max(12,m.y-4)); });
-  $("mlevels").innerHTML = marks.map(m=>`<span>${m.k}</span><span>${m.px||Math.round(m.y)}</span>`).join("");
-}
-cv.addEventListener("click", ev => {
-  if(!img) return;
-  const r=cv.getBoundingClientRect();
-  const y = ev.clientY-r.top;
-  marks = marks.filter(m=>m.k!==mode);
-  marks.push({k:mode,y,px:$("mprice").value||""});
-  draw();
-});
-function loadFile(f){ const rd=new FileReader(); rd.onload=()=>{ img=new Image(); img.onload=()=>{ marks=[]; draw(); }; img.src=rd.result; }; rd.readAsDataURL(f); }
-$("drop").onclick=()=>$("file").click();
-$("file").onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
-$("drop").addEventListener("dragover",e=>{e.preventDefault();$("drop").classList.add("hot");});
-$("drop").addEventListener("dragleave",()=>$("drop").classList.remove("hot"));
-$("drop").addEventListener("drop",e=>{ e.preventDefault(); $("drop").classList.remove("hot"); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+const A = window.AtlasControl; const $ = (id) => document.getElementById(id);
+const chips = ["Find today's highest-quality setups.","Show me today's trades.","Generate a performance report.","Compare these two strategies.","Stop trading.","Analyze all forex pairs and indices stocks"];
+$("chips").innerHTML = chips.map(c => `<button type="button" data-c="${c}">${c}</button>`).join("");
+$("chips").onclick = (e) => { const c = e.target.getAttribute("data-c"); if (!c) return; $("cmd").value = c; run(); };
+function renderRisk(){ const r=A.defaultRisk(); $("riskkv").innerHTML=`<span>Daily stop</span><span>${r.dailyUsedPct}% / ${r.dailyPct}%</span><span>Weekly</span><span>${r.weeklyUsedPct}% / ${r.weeklyPct}%</span><span>Monthly</span><span>${r.monthlyUsedPct}% / ${r.monthlyPct}%</span><span>Halt</span><span class="${A.halted()?'fail':'pass'}">${A.halted()?'ON':'off'}</span>`; }
+function renderStrats(){ $("strats").innerHTML=A.strategies().map(s=>`<div class="card"><b>#${s.id} ${s.name}</b> · ${s.on?'ON':'OFF'}</div>`).join(""); }
+function renderStages(reports){ const list=reports||[1,2,3,4,5,6,7].map(n=>A.runStage(n,"desk")); $("stages").innerHTML=list.map(s=>`<div class="card"><b>Stage ${s.stage}</b> — ${s.name}<br><span class="${s.pass?'pass':'fail'}">${s.locked?'LOCKED':(s.pass?'PASS':'HOLD')}</span></div>`).join(""); }
+function renderPipe(setup){ const rows=setup?A.pipelineFor(setup):A.PIPE.map(step=>({step,ok:step!=="SEND ORDER"&&step!=="VERIFY EXECUTION"&&step!=="VERIFY STOP LOSS",detail:step==="SEND ORDER"?"DENIED":""})); $("pipe").innerHTML=rows.map(r=>`<div class="step"><span>${r.step}</span><span class="${r.ok?'pass':'fail'}">${r.ok?'OK':'BLOCK'} ${r.detail||''}</span></div>`).join(""); }
+function renderBook(){ const rep=A.performanceReport(); const el=$("fbook"); if(rep.withheld){ el.textContent="Report withheld. Log or import fills."; return;} const b=rep.book; el.textContent="BOOK n="+b.n+" netR="+b.netR+" hit="+b.hitRate+"% PF="+b.profitFactor+" Sharpe="+b.rollingSharpe+" DD="+b.maxDDR+"R · today n="+rep.today.n+" netR="+(rep.today.netR||0); }
+function renderCards(rows){ if(!rows||!rows.length){$("cards").innerHTML="<p>No cards.</p>";return;} $("cards").innerHTML=rows.slice(0,8).map(s=>`<div class="card"><b>${s.id}</b> ${s.name} <span class="${s.pass?'pass':'fail'}">${s.pass?'EVALUATE':'DO NOTHING'}</span><div class="kv"><span>Side</span><span>${s.side}</span><span>Trend</span><span>${s.trend}</span><span>HTF</span><span>${s.higherTimeframe}</span><span>Structure</span><span>${s.marketStructure}</span><span>Quality</span><span>${s.entryQuality}/100</span><span>R:R</span><span>${s.riskReward}:1</span></div></div>`).join(""); window.__rows=rows; }
+function run(){ const res=A.parse($("cmd").value); A.logCommand($("cmd").value,res.reply); $("reply").style.display="block"; $("reply").textContent=res.reply+(res.rows?"\n"+JSON.stringify(res.rows,null,2):""); if(res.type==="scan"||res.type==="setups") renderCards(res.rows); if(res.type==="stage") renderStages([res.report,A.runStage(6),A.runStage(7)]); if(res.type==="sim") renderStages(res.reports.concat([A.runStage(6),A.runStage(7)])); if(res.type==="strategies") renderStrats(); if(res.type==="risk"||res.type==="halt"||res.type==="resume"||res.type==="report") { renderRisk(); renderBook(); } }
+$("go").onclick=run; $("stop").onclick=()=>{$("cmd").value="Stop trading.";run();}; $("sim").onclick=()=>{$("cmd").value="Run a new simulation.";run();};
+$("riskgo").onclick=()=>{$("cmd").value="Change the risk limit to "+($("riskin").value||"1.5");run();};
+$("fadd").onclick=()=>{ try{ A.addFill({pair:$("fpair").value,side:$("fside").value,entry:$("fentry").value,sl:$("fsl").value,exit:$("fexit").value,strategy:$("fstrat").value||"unlabeled"}); $("reply").style.display="block"; $("reply").textContent="Fill stored. sent=false."; renderBook(); renderRisk(); }catch(e){ $("reply").style.display="block"; $("reply").textContent=String(e.message||e);} };
+$("fimp").onclick=()=>{ const r=A.importFills($("fpaste").value); $("reply").style.display="block"; $("reply").textContent="Imported "+r.added+". errors "+r.errors.length+". book "+r.total; renderBook(); renderRisk(); };
+$("frun").onclick=()=>{ $("cmd").value="Generate a performance report."; run(); };
+let img=null,marks=[],mode="high"; const cv=$("cv"),ctx=cv.getContext("2d");
+document.querySelectorAll("[data-mark]").forEach(b=>b.onclick=()=>{mode=b.getAttribute("data-mark");});
+$("clr-marks").onclick=()=>{marks=[];draw();};
+function draw(){ if(!img)return; cv.hidden=false; const w=cv.parentElement.clientWidth-4; cv.width=w; cv.height=img.height*(w/img.width); ctx.drawImage(img,0,0,cv.width,cv.height); const color={high:"#ffd27d",low:"#8ec8ff",entry:"#7dffa6",sl:"#ff7d8a",tp:"#7dffa6"}; marks.forEach(m=>{ ctx.strokeStyle=color[m.k]||"#fff"; ctx.beginPath(); ctx.moveTo(0,m.y); ctx.lineTo(cv.width,m.y); ctx.stroke(); ctx.fillStyle=color[m.k]||"#fff"; ctx.fillText(m.k.toUpperCase()+(m.px?(" "+m.px):""),8,Math.max(12,m.y-4)); }); $("mlevels").innerHTML=marks.map(m=>`<span>${m.k}</span><span>${m.px||Math.round(m.y)}</span>`).join(""); }
+cv.onclick=ev=>{ if(!img)return; const y=ev.clientY-cv.getBoundingClientRect().top; marks=marks.filter(m=>m.k!==mode); marks.push({k:mode,y,px:$("mprice").value||""}); draw(); };
+function loadFile(f){ const rd=new FileReader(); rd.onload=()=>{ img=new Image(); img.onload=()=>{marks=[];draw();}; img.src=rd.result; }; rd.readAsDataURL(f); }
+$("drop").onclick=()=>$("file").click(); $("file").onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
+$("drop").addEventListener("dragover",e=>{e.preventDefault();}); $("drop").addEventListener("drop",e=>{e.preventDefault(); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);});
 window.addEventListener("paste",e=>{ const it=[...((e.clipboardData&&e.clipboardData.items)||[])].find(i=>i.type.startsWith("image/")); if(it) loadFile(it.getAsFile()); });
-fetch("/api/health").then(r=>r.json()).then(j=>{ const fine=j.ok && j.version==="atlas-3.0.0" && j.watch==="24/7"; $("st").textContent = fine ? "SECURE · "+j.version : "HOLD"; $("st").className = fine ? "ok" : "hold"; }).catch(()=>{ $("st").textContent="HOLD"; $("st").className="hold"; });
-renderRisk(); renderStrats(); renderStages(); renderPipe(); renderCards(A.qualitySetups());
+fetch("/api/health").then(r=>r.json()).then(j=>{ const fine=j.ok&&j.version==="atlas-3.1.0"&&j.watch==="24/7"; $("st").textContent=fine?"SECURE · "+j.version:"HOLD"; $("st").className=fine?"ok":"hold"; }).catch(()=>{$("st").textContent="HOLD";});
+renderRisk(); renderStrats(); renderStages(); renderPipe(); renderCards(A.qualitySetups()); renderBook();
 </script>
 </body>
 </html>
