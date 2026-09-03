@@ -3,8 +3,8 @@ module.exports = (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
     ok: true,
-    version: "atlas-3.0.0",
-    engine: "atlas-3.0.0",
+    version: "atlas-3.1.0",
+    engine: "atlas-3.1.0",
     watch: "24/7",
     desk: "atlas",
     broker: false,
@@ -18,6 +18,7 @@ module.exports = (req, res) => {
       staged_validation: true,
       order_pipeline: true,
       setup_scorecard: true,
+      operator_fills: true,
     },
     guard: {
       no_gold_sells_at_demand: true,

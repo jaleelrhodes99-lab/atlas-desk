@@ -34,25 +34,25 @@
   <header>
     <div id="st">checking…</div>
     <h1>ATLAS</h1>
-    <div class="sub">Two desks. Engine atlas-3.0.0. Structure only — never a broker.</div>
+    <div class="sub">Two desks. Engine atlas-3.1.0. Structure only — never a broker.</div>
   </header>
   <div class="grid">
-    <a class="card" href="/control.html">
+    <a class="card" href="/control">
       <div class="tag">Category A · Control</div>
       <h2>Trading bot desk</h2>
-      <p>Talk to the lab in plain language. Scan FX, indices, and stocks. Score setups. Run stages 1–5. Screenshot box with highs, lows, entry, TP, SL. Orders stop at SEND.</p>
+      <p>Talk to the lab. Log real fills. Reports only from your book. Screenshot marks. SEND denied.</p>
     </a>
-    <a class="card" href="/security.html">
+    <a class="card" href="/security">
       <div class="tag sec">Category B · Security</div>
       <h2>AEGIS security desk</h2>
-      <p>Perimeter, health, memory gate, hard blocks, kill posture. No strategy commands. No tickets. Policy engine stays on.</p>
+      <p>Perimeter, health, memory gate, hard blocks. No strategy commands. Leave this desk unless posture is the question.</p>
     </a>
   </div>
   <footer>Atlas is a map. AEGIS is the gate. Neither is a broker. Residual risk remains.</footer>
   <script>
     fetch("/api/health").then(r=>r.json()).then(j=>{
       const el=document.getElementById("st");
-      const fine=j.ok && j.version==="atlas-3.0.0" && j.watch==="24/7";
+      const fine=j.ok && j.version==="atlas-3.1.0" && j.watch==="24/7";
       el.textContent = fine ? "SECURE · "+j.version : "HOLD";
       el.style.color = fine ? "#7dffa6" : "#ffd27d";
     }).catch(()=>{ document.getElementById("st").textContent="HOLD"; });

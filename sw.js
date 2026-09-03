@@ -1,4 +1,4 @@
-const CACHE = "atlas-desk-3.0.0";
+const CACHE = "atlas-desk-3.1.0";
 const PRECACHE = ["/", "/index.html", "/control.html", "/security.html", "/manifest.json", "/icon.svg", "/js/atlas-control.js", "/control-contract.json"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
