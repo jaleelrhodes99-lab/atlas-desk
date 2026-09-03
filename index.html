@@ -50,6 +50,10 @@
   </div>
   <footer>Atlas is a map. AEGIS is the gate. Neither is a broker. Residual risk remains.</footer>
   <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script>
     fetch("/api/health").then(r=>r.json()).then(j=>{
       const el=document.getElementById("st");
       const fine=j.ok && j.version==="atlas-3.1.0" && j.watch==="24/7";
