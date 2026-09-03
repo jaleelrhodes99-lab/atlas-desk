@@ -3,8 +3,8 @@ module.exports = (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
     ok: true,
-    version: "atlas-3.1.0",
-    engine: "atlas-3.1.0",
+    version: "atlas-2.3.0",
+    engine: "atlas-2.3.0",
     watch: "24/7",
     desk: "atlas",
     broker: false,
