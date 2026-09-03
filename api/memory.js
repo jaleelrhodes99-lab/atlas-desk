@@ -1,8 +1,11 @@
+const crypto = require("crypto");
 const MEM0 = "https://api.mem0.ai/v1";
+const WRITE_MAX = 2000;
 
 function json(res, status, body) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Content-Type", "application/json");
+  res.setHeader("X-Content-Type-Options", "nosniff");
   res.status(status).json(body);
 }
 
@@ -12,6 +15,27 @@ function configured() {
 
 function userId() {
   return process.env.MEM0_USER_ID || "atlas-desk-jaleel";
+}
+
+function header(req, name) {
+  const value = req.headers[name];
+  if (Array.isArray(value)) return value[0] || "";
+  return value || "";
+}
+
+function gateOk(req) {
+  const expected = process.env.ATLAS_MEMORY_GATE || "";
+  if (!expected) return false;
+  let provided = header(req, "x-atlas-memory-key");
+  const auth = header(req, "authorization");
+  if (!provided && /^Bearer /i.test(auth)) {
+    provided = auth.slice(7).trim();
+  }
+  if (!provided) return false;
+  const a = Buffer.from(String(provided));
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 
 async function mem0(path, method, payload) {
@@ -29,33 +53,40 @@ async function mem0(path, method, payload) {
   try {
     data = text ? JSON.parse(text) : {};
   } catch {
-    data = { raw: text };
+    data = {};
   }
   if (!res.ok) {
-    const err = new Error(data.error || data.message || `mem0 ${res.status}`);
-    err.status = res.status;
-    err.data = data;
+    const err = new Error("memory cloud call failed");
+    err.status = res.status >= 400 && res.status < 500 ? res.status : 502;
     throw err;
   }
   return data;
 }
 
 module.exports = async (req, res) => {
-  const plugin = {
+  const allowed = gateOk(req);
+  const publicPlugin = {
     id: "memory-cloud",
     provider: "mem0",
+    broker: false,
+    gated: true,
+  };
+  const plugin = {
+    ...publicPlugin,
     connected: configured(),
     user_id: userId(),
-    broker: false,
   };
 
   if (req.method === "GET") {
+    if (!allowed) {
+      return json(res, 200, { ok: true, plugin: publicPlugin });
+    }
     return json(res, 200, {
       ok: true,
       plugin,
       next: configured()
         ? "POST /api/memory with { action: recall|write }"
-        : "Set MEM0_API_KEY on the Vercel project, then retry",
+        : "Set MEM0_API_KEY on the Vercel project as a Secret, then retry",
     });
   }
 
@@ -63,12 +94,19 @@ module.exports = async (req, res) => {
     return json(res, 405, { ok: false, error: "method not allowed" });
   }
 
+  if (!allowed) {
+    return json(res, 401, {
+      ok: false,
+      plugin: publicPlugin,
+      error: "memory gate required",
+    });
+  }
+
   if (!configured()) {
     return json(res, 409, {
       ok: false,
       plugin,
       error: "memory cloud not connected",
-      hint: "Create a key at https://app.mem0.ai and set MEM0_API_KEY",
     });
   }
 
@@ -85,7 +123,7 @@ module.exports = async (req, res) => {
 
   try {
     if (action === "recall") {
-      const query = String(body.query || "atlas desk structure");
+      const query = String(body.query || "atlas desk structure").slice(0, WRITE_MAX);
       const data = await mem0("/memories/search/", "POST", {
         query,
         user_id: userId(),
@@ -97,6 +135,9 @@ module.exports = async (req, res) => {
       const text = String(body.text || "").trim();
       if (!text) {
         return json(res, 400, { ok: false, error: "text required" });
+      }
+      if (text.length > WRITE_MAX) {
+        return json(res, 400, { ok: false, error: "text too long" });
       }
       const data = await mem0("/memories/", "POST", {
         messages: [{ role: "user", content: text }],
@@ -111,7 +152,7 @@ module.exports = async (req, res) => {
     return json(res, err.status || 502, {
       ok: false,
       plugin: { ...plugin, connected: false },
-      error: err.message || "memory cloud call failed",
+      error: "memory cloud call failed",
     });
   }
 };
