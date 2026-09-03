@@ -1,0 +1,49 @@
+{
+  "engine": "atlas-3.0.0",
+  "broker": false,
+  "desks": {
+    "control": "strategy lab, commands, stages 1-5, paper tickets",
+    "security": "AEGIS perimeter, audit, kill switch — no trade commands"
+  },
+  "learning_rule": "Fit historical datasets. Do not treat any fit as a durable market law. Edges expire. Walk-forward is required before paper.",
+  "promotion": [
+    "1_backtest",
+    "2_out_of_sample",
+    "3_walk_forward",
+    "4_monte_carlo",
+    "5_paper",
+    "6_tiny_live_locked",
+    "7_scale_locked"
+  ],
+  "live_lock": "Stages 6 and 7 cannot send broker orders from this desk.",
+  "entry_rule": {
+    "score_min": 85,
+    "rr_min": 2.0,
+    "spread_ok": true,
+    "no_high_impact_news": true,
+    "daily_loss_not_hit": true,
+    "else": "DO NOTHING"
+  },
+  "hard_blocks": [
+    "no gold sells at demand",
+    "no JPY dumps without CHoCH",
+    "2.00 lot cap",
+    "no averaging",
+    "no chasing a just-hit TP"
+  ],
+  "order_pipeline": [
+    "SIGNAL",
+    "VALIDATE_DATA",
+    "CHECK_MARKET_CONDITIONS",
+    "CHECK_SPREAD",
+    "CHECK_NEWS",
+    "CHECK_ACCOUNT",
+    "CALCULATE_POSITION_SIZE",
+    "CHECK_MAX_RISK",
+    "CHECK_DAILY_LOSS",
+    "CHECK_DUPLICATE_ORDER",
+    "SEND_ORDER_DENIED",
+    "VERIFY_SKIPPED",
+    "LOG_EVERYTHING"
+  ]
+}

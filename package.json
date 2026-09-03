@@ -1,6 +1,6 @@
 {
   "name": "atlas-desk",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "private": true,
-  "description": "Atlas Desk 2.4 — market-structure command center. Screenshot drop box, entry/TP/SL signals, Home Screen install. Not a broker."
+  "description": "Atlas Desk 3.0 — control lab + AEGIS security desk. Not a broker."
 }

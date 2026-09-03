@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#070b16"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml"/>
+  <title>Atlas Security · AEGIS</title>
+  <style>
+    :root { color-scheme:dark; --bg:#070b16; --panel:#10182c; --line:#2a365c; --ink:#e8edf7; --mut:#93a0bb; --ok:#7dffa6; --hold:#ffd27d; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--ink); }
+    header { display:flex; justify-content:space-between; gap:12px; padding:18px 22px; border-bottom:1px solid var(--line); }
+    a { color:#8ec8ff; }
+    main { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; padding:18px 22px 36px; }
+    article { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+    h1 { margin:0; font-size:20px; letter-spacing:.1em; }
+    h2 { margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.04em; }
+    p,li { color:var(--mut); font-size:14px; line-height:1.45; }
+    .ok { color:var(--ok); font-weight:700; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SECURITY DESK</h1>
+      <div style="color:#93a0bb;font-size:12px;margin-top:4px">AEGIS only · no trade commands · atlas-3.0.0</div>
+    </div>
+    <div>
+      <div class="ok" id="st">checking…</div>
+      <div><a href="/">Hub</a> · <a href="/control.html">Control</a></div>
+    </div>
+  </header>
+  <main>
+    <article>
+      <h2>Watch</h2>
+      <p>24/7 sentinel on <code>/api/health</code>. Expected version atlas-3.0.0, ok true, watch 24/7, broker false.</p>
+    </article>
+    <article>
+      <h2>Hard blocks</h2>
+      <ul>
+        <li>No gold sells at demand</li>
+        <li>No JPY dumps without CHoCH</li>
+        <li>2.00 lot cap</li>
+        <li>No averaging</li>
+        <li>No chasing a just-hit TP</li>
+        <li>SEND ORDER denied on this product</li>
+      </ul>
+    </article>
+    <article>
+      <h2>AEGIS perimeter</h2>
+      <p>Unknown principals cannot run protect/kill. Policy engine stays on. Audit chain is hash-linked. This desk does not place trades and does not scan markets.</p>
+    </article>
+    <article>
+      <h2>Memory Cloud</h2>
+      <p id="mem">checking plugin…</p>
+      <p>Write/recall stay operator-gated. Public page holds no gate key.</p>
+    </article>
+    <article>
+      <h2>Residual risk</h2>
+      <p>Do not claim all attackers blocked. Secrets must stay in Vercel Secrets. Automations report posture only. They do not hold production credentials and they do not commit.</p>
+    </article>
+  </main>
+  <script>
+    fetch("/api/health").then(r=>r.json()).then(j=>{
+      const fine=j.ok && j.version==="atlas-3.0.0" && j.watch==="24/7" && j.broker===false;
+      const el=document.getElementById("st");
+      el.textContent = fine ? "SECURE · "+j.version+" · threat "+j.threat : "HOLD";
+    }).catch(()=>{ document.getElementById("st").textContent="HOLD"; });
+    fetch("/api/memory").then(r=>r.json()).then(j=>{
+      document.getElementById("mem").textContent = j.plugin && j.plugin.gated ? "GATED · public write/recall denied" : "plugin reachable";
+    }).catch(()=>{ document.getElementById("mem").textContent="plugin unreachable"; });
+  </script>
+</body>
+</html>

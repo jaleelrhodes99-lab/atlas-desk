@@ -1,11 +1,12 @@
 {
-  "engine": "atlas-2.4.0",
+  "engine": "atlas-3.0.0",
   "hard_blocks": [
     "no gold sells at demand",
     "no JPY dumps without CHoCH",
     "2.00 lot cap",
     "no averaging",
-    "no chasing a just-hit TP"
+    "no chasing a just-hit TP",
+    "send order denied"
   ],
   "identity": "This is a structure desk, not a broker. It never places trades."
 }

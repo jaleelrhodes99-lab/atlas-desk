@@ -1,6 +1,9 @@
-# Atlas Desk 2.4
+# Atlas Desk 3.0
 
-Market-structure command center for Jaleel Rhodes.
+Two desks for Jaleel Rhodes.
+
+- **Control** `/control.html` — command layer, setup cards, staged lab, screenshot marks.
+- **Security** `/security.html` — AEGIS only.
 
 This is a **structure desk**, not a broker. It never places trades.
 
@@ -8,42 +11,26 @@ This is a **structure desk**, not a broker. It never places trades.
 
 https://atlas-desk-gamma.vercel.app
 
-## 2.4 surfaces
+## Commands
 
-- Screenshot drop box (local only — drop / paste / pick)
-- Entry · TP · SL signal board with R:R and hard-block checks
-- Add to Home Screen (PWA + iOS Safari instructions)
+Analyze universe · Find today's highest-quality setups · Backtest · Compare strategies · Turn strategy #N off · Change the risk limit · Explain why the bot entered · Show today's trades · Stop trading · Run a simulation · Generate a performance report.
+
+## Learning rule
+
+Fit historical datasets. Do not treat any fit as a durable market relationship. Walk-forward before paper.
+
+## Stages
+
+1 Backtest · 2 Out-of-sample · 3 Walk-forward · 4 Monte Carlo · 5 Paper · 6 Tiny live LOCKED · 7 Scale LOCKED
+
+## Order pipeline
+
+SIGNAL → validate data → market → spread → news → account → size → max risk → daily loss → duplicate → **SEND DENIED** → log.
 
 ## Live contract
 
-`GET /api/health` must return `ok: true`, `version: atlas-2.4.0`, `watch: 24/7`.
+`GET /api/health` must return `ok: true`, `version: atlas-3.0.0`, `watch: 24/7`, `broker: false`.
 
-## Memory Cloud plugin
+## Residual
 
-Mem0 stays behind an operator gate. The public page does not hold secrets.
-
-1. Create an API key at [app.mem0.ai](https://app.mem0.ai).
-2. On the Vercel project, set as **Secrets**:
-   - `MEM0_API_KEY`
-   - `ATLAS_MEMORY_GATE` (long random operator key)
-   - `MEM0_USER_ID` (optional; defaults to `atlas-desk-jaleel`)
-3. Redeploy.
-4. Public `GET /api/memory` returns only `{ gated: true }` — no user id, no connected flag.
-5. Operator `GET` / `POST` must send header `x-atlas-memory-key: $ATLAS_MEMORY_GATE`.
-6. Write cap is 2000 characters. Upstream errors are not echoed.
-
-The plugin cannot place trades and does not change hard blocks.
-
-## Hard blocks
-
-- No gold sells at demand
-- No JPY dumps without CHoCH
-- 2.00 lot cap
-- No averaging
-- No chasing a just-hit TP
-
-## Surfaces
-
-- GitHub: `jaleelrhodes99-lab/atlas-desk`
-- Vercel team: `jaleelrhodes99-4870`
-- Plugin manifest: `plugins/memory-cloud.json`
+Lab tape is not a live feed. Cards are a rubric on a dated sample, plus your chart screenshot. Profit is not guaranteed. Attackers are not "all blocked."
