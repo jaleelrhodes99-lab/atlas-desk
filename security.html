@@ -72,5 +72,9 @@
       document.getElementById("mem").textContent = j.plugin && j.plugin.gated ? "GATED · public write/recall denied" : "plugin reachable";
     }).catch(()=>{ document.getElementById("mem").textContent="plugin unreachable"; });
   </script>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
