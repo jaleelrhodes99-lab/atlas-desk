@@ -2,15 +2,20 @@
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { createGitHubAppService } = require('./github-app/app');
-const { createInMemoryRateLimiter } = require('./github-app/rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || 'development';
 const githubAppService = createGitHubAppService();
-const webhookRateLimit = createInMemoryRateLimiter({ windowMs: 60 * 1000, maxRequests: 120 });
+const webhookRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // Middleware
 app.use(cors());

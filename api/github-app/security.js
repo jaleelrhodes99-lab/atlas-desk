@@ -32,7 +32,7 @@ function createDeliveryStore(options = {}) {
     markIfNew(deliveryId) {
       const now = Date.now();
       prune(now);
-      if (!deliveryId) return true;
+      if (!deliveryId) return false;
       if (entries.has(deliveryId)) return false;
       entries.set(deliveryId, now);
       return true;

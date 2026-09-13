@@ -102,7 +102,11 @@ function createInstallationOctokit(installationId) {
 function createGitHubAppService() {
   const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
   const allowedRepos = parseAllowedRepos(process.env.ALLOWED_REPOS);
-  const responder = createOpenAIResponder({ openAITimeoutMs: 10000 });
+  const responder = createOpenAIResponder({
+    apiKey: process.env.OPENAI_API_KEY,
+    model: process.env.OPENAI_MODEL || "gpt-5-mini",
+    openAITimeoutMs: 10000,
+  });
   const deliveries = createDeliveryStore();
 
   const enabled = Boolean(
@@ -128,6 +132,10 @@ function createGitHubAppService() {
         return res.status(401).json({ ok: false, error: "invalid_signature" });
       }
 
+      if (!deliveryId) {
+        return res.status(400).json({ ok: false, error: "missing_delivery_id" });
+      }
+
       if (!deliveries.markIfNew(deliveryId)) {
         return res.status(200).json({ ok: true, duplicate: true });
       }
@@ -143,14 +151,15 @@ function createGitHubAppService() {
       if (allowedRepos && !allowedRepos.has(fullName)) {
         return res.status(202).json({ ok: true, ignored: "repo_not_allowed" });
       }
+      const [owner, repo] = String(fullName || "").split("/");
+      if (!owner || !repo) {
+        return res.status(400).json({ ok: false, error: "invalid_repository" });
+      }
 
       const installationId = payload?.installation?.id;
       if (!installationId) {
         return res.status(202).json({ ok: true, ignored: "missing_installation" });
       }
-
-      const owner = payload.repository.owner.login;
-      const repo = payload.repository.name;
       const octokit = createInstallationOctokit(installationId);
 
       if (eventType === "issues" && payload.action === "opened") {
@@ -194,7 +203,7 @@ function createGitHubAppService() {
           payload.comment?.user?.login
         );
         if (!allowed) {
-          return res.status(403).json({ ok: true, denied: true });
+          return res.status(403).json({ ok: false, denied: true });
         }
 
         if (command === "/triage") {

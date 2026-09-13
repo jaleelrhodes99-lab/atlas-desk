@@ -32,6 +32,11 @@ test("delivery store rejects duplicate delivery ids", () => {
   assert.equal(store.markIfNew("delivery-2"), true);
 });
 
+test("delivery store rejects missing delivery ids", () => {
+  const store = createDeliveryStore({ ttlMs: 1000, maxEntries: 10 });
+  assert.equal(store.markIfNew(""), false);
+});
+
 test("delivery store allows id after TTL expiry", async () => {
   const store = createDeliveryStore({ ttlMs: 10, maxEntries: 10 });
   assert.equal(store.markIfNew("delivery-expire"), true);

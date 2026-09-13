@@ -16,9 +16,9 @@ function getOutputText(response) {
   return texts.join("\n").trim();
 }
 
-function createOpenAIResponder(config) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-5-mini";
+function createOpenAIResponder(config = {}) {
+  const apiKey = config.apiKey;
+  const model = config.model || "gpt-5-mini";
 
   if (!apiKey) {
     return {
