@@ -22,7 +22,10 @@ app.use(cors());
 app.post(
   '/api/github/webhook',
   webhookRateLimit,
-  express.raw({ type: 'application/json', limit: '1mb' }),
+  express.raw({
+    type: (req) => req.is('application/json') || req.is('application/*+json'),
+    limit: '1mb'
+  }),
   (req, res) => githubAppService.handleWebhook(req, res)
 );
 app.use(express.json());

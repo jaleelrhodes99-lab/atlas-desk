@@ -44,3 +44,11 @@ test("delivery store allows id after TTL expiry", async () => {
   await new Promise((resolve) => setTimeout(resolve, 20));
   assert.equal(store.markIfNew("delivery-expire"), true);
 });
+
+test("delivery store evicts oldest when max entries exceeded", () => {
+  const store = createDeliveryStore({ ttlMs: 1000, maxEntries: 2 });
+  assert.equal(store.markIfNew("d1"), true);
+  assert.equal(store.markIfNew("d2"), true);
+  assert.equal(store.markIfNew("d3"), true);
+  assert.equal(store.markIfNew("d1"), true);
+});

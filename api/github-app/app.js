@@ -136,15 +136,15 @@ function createGitHubAppService() {
         return res.status(400).json({ ok: false, error: "missing_delivery_id" });
       }
 
-      if (!deliveries.markIfNew(deliveryId)) {
-        return res.status(200).json({ ok: true, duplicate: true });
-      }
-
       let payload;
       try {
         payload = JSON.parse(rawBody.toString("utf8"));
       } catch {
         return res.status(400).json({ ok: false, error: "invalid_payload" });
+      }
+
+      if (!deliveries.markIfNew(deliveryId)) {
+        return res.status(200).json({ ok: true, duplicate: true });
       }
 
       const fullName = payload?.repository?.full_name;
