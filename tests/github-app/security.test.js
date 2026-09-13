@@ -31,3 +31,11 @@ test("delivery store rejects duplicate delivery ids", () => {
   assert.equal(store.markIfNew("delivery-1"), false);
   assert.equal(store.markIfNew("delivery-2"), true);
 });
+
+test("delivery store allows id after TTL expiry", async () => {
+  const store = createDeliveryStore({ ttlMs: 10, maxEntries: 10 });
+  assert.equal(store.markIfNew("delivery-expire"), true);
+  assert.equal(store.markIfNew("delivery-expire"), false);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(store.markIfNew("delivery-expire"), true);
+});

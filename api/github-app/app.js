@@ -194,12 +194,6 @@ function createGitHubAppService() {
           payload.comment?.user?.login
         );
         if (!allowed) {
-          await octokit.rest.issues.createComment({
-            owner,
-            repo,
-            issue_number: payload.issue.number,
-            body: "Denied: only repository collaborators can run issue triage commands.",
-          });
           return res.status(403).json({ ok: true, denied: true });
         }
 
