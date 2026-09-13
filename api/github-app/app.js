@@ -161,20 +161,20 @@ function createGitHubAppService(options = {}) {
       }
 
       const fullName = payload?.repository?.full_name;
-      if (allowedRepos && !allowedRepos.has(fullName)) {
-        return res.status(202).json({ ok: true, ignored: "repo_not_allowed" });
-      }
       const [owner, repo] = String(fullName || "").split("/");
       if (!owner || !repo) {
         return res.status(400).json({ ok: false, error: "invalid_repository" });
+      }
+      if (!deliveries.markIfNew(deliveryId)) {
+        return res.status(200).json({ ok: true, duplicate: true });
+      }
+      if (allowedRepos && !allowedRepos.has(fullName)) {
+        return res.status(202).json({ ok: true, ignored: "repo_not_allowed" });
       }
 
       const installationId = payload?.installation?.id;
       if (!installationId) {
         return res.status(202).json({ ok: true, ignored: "missing_installation" });
-      }
-      if (!deliveries.markIfNew(deliveryId)) {
-        return res.status(200).json({ ok: true, duplicate: true });
       }
       const octokit = installationOctokitFactory(installationId);
 

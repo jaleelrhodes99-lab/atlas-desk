@@ -13,8 +13,8 @@ function verifyGitHubSignature(rawBody, signatureHeader, webhookSecret) {
 }
 
 function createDeliveryStore(options = {}) {
-  const maxEntries = options.maxEntries || 1000;
-  const ttlMs = options.ttlMs || 10 * 60 * 1000;
+  const maxEntries = options.maxEntries ?? 1000;
+  const ttlMs = options.ttlMs ?? 10 * 60 * 1000;
   const entries = new Map();
 
   function prune(now) {

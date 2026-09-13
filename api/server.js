@@ -18,7 +18,7 @@ const webhookRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    if (!githubWebhookSecret) return true;
+    if (!githubWebhookSecret) return false;
     return !verifyGitHubSignature(
       req.body,
       req.get('x-hub-signature-256'),
