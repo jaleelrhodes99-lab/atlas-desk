@@ -3,14 +3,30 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { createGitHubAppService } = require('./github-app/app');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || 'development';
+const githubAppService = createGitHubAppService();
 
 // Middleware
 app.use(cors());
+app.post(
+  '/api/github/webhook',
+  express.raw({ type: 'application/json', limit: '1mb' }),
+  (req, res) => githubAppService.handleWebhook(req, res)
+);
 app.use(express.json());
+
+app.get('/health', (req, res) => {
+  res.json({
+    ok: true,
+    service: 'atlas-desk',
+    githubApp: githubAppService.enabled,
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Health check endpoint (required by contract)
 app.get('/api/health', (req, res) => {
