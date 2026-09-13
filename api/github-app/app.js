@@ -74,8 +74,14 @@ async function addLabelsIfAny(octokit, owner, repo, issueNumber, labels) {
   });
 }
 
-async function isPrivilegedPrincipal(octokit, owner, repo, username) {
+async function isPrivilegedPrincipal(octokit, owner, repo, username, repositoryOwner) {
   if (!username) return false;
+  if (
+    repositoryOwner &&
+    username.toLowerCase() === String(repositoryOwner).toLowerCase()
+  ) {
+    return true;
+  }
   try {
     const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
       owner,
@@ -88,30 +94,41 @@ async function isPrivilegedPrincipal(octokit, owner, repo, username) {
   }
 }
 
-function createInstallationOctokit(installationId) {
+function createInstallationOctokit(installationId, env = process.env) {
   return new Octokit({
     authStrategy: createAppAuth,
     auth: {
-      appId: process.env.GITHUB_APP_ID,
-      privateKey: process.env.GITHUB_PRIVATE_KEY,
+      appId: env.GITHUB_APP_ID,
+      privateKey: env.GITHUB_PRIVATE_KEY,
       installationId,
     },
   });
 }
 
-function createGitHubAppService() {
-  const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
-  const allowedRepos = parseAllowedRepos(process.env.ALLOWED_REPOS);
-  const responder = createOpenAIResponder({
-    apiKey: process.env.OPENAI_API_KEY,
-    model: process.env.OPENAI_MODEL || "gpt-5-mini",
-    openAITimeoutMs: 10000,
-  });
-  const deliveries = createDeliveryStore();
+function createGitHubAppService(options = {}) {
+  const env = options.env || process.env;
+  const webhookSecret = options.webhookSecret || env.GITHUB_WEBHOOK_SECRET;
+  const allowedRepos =
+    options.allowedRepos instanceof Set
+      ? options.allowedRepos
+      : parseAllowedRepos(options.allowedRepos || env.ALLOWED_REPOS);
+  const responder =
+    options.responder ||
+    createOpenAIResponder({
+      apiKey: env.OPENAI_API_KEY,
+      model: env.OPENAI_MODEL || "gpt-5-mini",
+      openAITimeoutMs: 10000,
+    });
+  const deliveries = options.deliveries || createDeliveryStore();
+  const installationOctokitFactory =
+    options.createInstallationOctokit ||
+    ((installationId) => createInstallationOctokit(installationId, env));
 
-  const enabled = Boolean(
-    process.env.GITHUB_APP_ID && process.env.GITHUB_PRIVATE_KEY && webhookSecret
-  );
+  const enabled =
+    typeof options.enabled === "boolean"
+      ? options.enabled
+      : Boolean(env.GITHUB_APP_ID && env.GITHUB_PRIVATE_KEY && webhookSecret);
+  const repositoryOwner = options.repositoryOwner || null;
 
   return {
     enabled,
@@ -143,10 +160,6 @@ function createGitHubAppService() {
         return res.status(400).json({ ok: false, error: "invalid_payload" });
       }
 
-      if (!deliveries.markIfNew(deliveryId)) {
-        return res.status(200).json({ ok: true, duplicate: true });
-      }
-
       const fullName = payload?.repository?.full_name;
       if (allowedRepos && !allowedRepos.has(fullName)) {
         return res.status(202).json({ ok: true, ignored: "repo_not_allowed" });
@@ -160,7 +173,10 @@ function createGitHubAppService() {
       if (!installationId) {
         return res.status(202).json({ ok: true, ignored: "missing_installation" });
       }
-      const octokit = createInstallationOctokit(installationId);
+      if (!deliveries.markIfNew(deliveryId)) {
+        return res.status(200).json({ ok: true, duplicate: true });
+      }
+      const octokit = installationOctokitFactory(installationId);
 
       if (eventType === "issues" && payload.action === "opened") {
         if (isBotAccount(payload.sender)) {
@@ -200,10 +216,15 @@ function createGitHubAppService() {
           octokit,
           owner,
           repo,
-          payload.comment?.user?.login
+          payload.comment?.user?.login,
+          repositoryOwner || owner
         );
         if (!allowed) {
-          return res.status(403).json({ ok: false, denied: true });
+          return res.status(403).json({
+            ok: false,
+            error: "insufficient_permissions",
+            denied: true,
+          });
         }
 
         if (command === "/triage") {

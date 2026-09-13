@@ -5,27 +5,37 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { createGitHubAppService } = require('./github-app/app');
+const { verifyGitHubSignature } = require('./github-app/security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || 'development';
 const githubAppService = createGitHubAppService();
+const githubWebhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 const webhookRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 120,
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => {
+    if (!githubWebhookSecret) return true;
+    return !verifyGitHubSignature(
+      req.body,
+      req.get('x-hub-signature-256'),
+      githubWebhookSecret
+    );
+  }
 });
 
 // Middleware
 app.use(cors());
 app.post(
   '/api/github/webhook',
-  webhookRateLimit,
   express.raw({
     type: (req) => req.is('application/json') || req.is('application/*+json'),
     limit: '1mb'
   }),
+  webhookRateLimit,
   (req, res) => githubAppService.handleWebhook(req, res)
 );
 app.use(express.json());
