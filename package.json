@@ -2,7 +2,7 @@
   "name": "atlas-desk",
   "version": "3.1.0",
   "private": true,
-  "description": "Atlas Desk 3.1 — operator-fill reports. Not a broker.",
+  "description": "Atlas Desk 3.1 \u2014 operator-fill reports. Not a broker.",
   "scripts": {
     "start": "node api/server.js",
     "dev": "node api/server.js",
@@ -10,10 +10,11 @@
     "build:web": "echo 'Web build ready'",
     "build:mobile": "echo 'Mobile build ready'",
     "build:desktop": "echo 'Desktop build ready'",
-    "test": "echo 'Tests pass'",
-    "lint": "echo 'Lint pass'",
+    "test": "node --test tests/*.test.js",
+    "lint": "node scripts/check-syntax.js",
     "deploy": "vercel",
-    "deploy:prod": "vercel --prod"
+    "deploy:prod": "vercel --prod",
+    "healthcheck": "node scripts/healthcheck.js"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -35,7 +35,7 @@
   <main>
     <article>
       <h2>Watch</h2>
-      <p>24/7 sentinel on <code>/api/health</code>. Expected version atlas-3.0.0, ok true, watch 24/7, broker false.</p>
+      <p><code>/api/health</code> checks API availability only. Expected version atlas-3.1.0 and broker false. Continuous monitoring and AEGIS protection require separate verification.</p>
     </article>
     <article>
       <h2>Hard blocks</h2>
@@ -50,7 +50,7 @@
     </article>
     <article>
       <h2>AEGIS perimeter</h2>
-      <p>Unknown principals cannot run protect/kill. Policy engine stays on. Audit chain is hash-linked. This desk does not place trades and does not scan markets.</p>
+      <p>AEGIS policy engine, audit chain and kill switch are not verified by this page. This desk does not place trades or scan markets. Keep execution disabled until the separate AEGIS system is verified.</p>
     </article>
     <article>
       <h2>Memory Cloud</h2>
@@ -64,9 +64,9 @@
   </main>
   <script>
     fetch("/api/health").then(r=>r.json()).then(j=>{
-      const fine=j.ok && j.version==="atlas-3.0.0" && j.watch==="24/7" && j.broker===false;
+      const fine=j.ok && j.version==="atlas-3.1.0" && j.watch==="24/7" && j.broker===false;
       const el=document.getElementById("st");
-      el.textContent = fine ? "SECURE · "+j.version+" · threat "+j.threat : "HOLD";
+      el.textContent = fine ? "API ONLINE · "+j.version+" · security unverified" : "HOLD";
     }).catch(()=>{ document.getElementById("st").textContent="HOLD"; });
     fetch("/api/memory").then(r=>r.json()).then(j=>{
       document.getElementById("mem").textContent = j.plugin && j.plugin.gated ? "GATED · public write/recall denied" : "plugin reachable";

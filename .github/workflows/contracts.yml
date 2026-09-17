@@ -1,0 +1,18 @@
+name: Atlas contract tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --omit=dev --ignore-scripts --package-lock=false
+      - run: npm run lint
+      - run: npm test

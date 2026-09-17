@@ -108,7 +108,7 @@ function loadFile(f){ const rd=new FileReader(); rd.onload=()=>{ img=new Image()
 $("drop").onclick=()=>$("file").click(); $("file").onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); };
 $("drop").addEventListener("dragover",e=>{e.preventDefault();}); $("drop").addEventListener("drop",e=>{e.preventDefault(); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);});
 window.addEventListener("paste",e=>{ const it=[...((e.clipboardData&&e.clipboardData.items)||[])].find(i=>i.type.startsWith("image/")); if(it) loadFile(it.getAsFile()); });
-fetch("/api/health").then(r=>r.json()).then(j=>{ const fine=j.ok&&j.version==="atlas-3.1.0"&&j.watch==="24/7"; $("st").textContent=fine?"SECURE · "+j.version:"HOLD"; $("st").className=fine?"ok":"hold"; }).catch(()=>{$("st").textContent="HOLD";});
+fetch("/api/health").then(r=>r.json()).then(j=>{ const fine=j.ok&&j.version==="atlas-3.1.0"&&j.watch==="24/7"; $("st").textContent=fine?"API ONLINE · "+j.version:"HOLD"; $("st").className=fine?"ok":"hold"; }).catch(()=>{$("st").textContent="HOLD";});
 renderRisk(); renderStrats(); renderStages(); renderPipe(); renderCards(A.qualitySetups()); renderBook();
 </script>
 </body>

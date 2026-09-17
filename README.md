@@ -1,4 +1,4 @@
-# Atlas Desk 3.0
+# Atlas Desk 3.1
 
 Two desks for Jaleel Rhodes.
 
@@ -29,8 +29,16 @@ SIGNAL → validate data → market → spread → news → account → size →
 
 ## Live contract
 
-`GET /api/health` must return `ok: true`, `version: atlas-3.0.0`, `watch: 24/7`, `broker: false`.
+`GET /api/health` must return `ok: true`, `version: atlas-3.1.0`, `watch: 24/7`, `broker: false`.
 
 ## Residual
 
 Lab tape is not a live feed. Cards are a rubric on a dated sample, plus your chart screenshot. Profit is not guaranteed. Attackers are not "all blocked."
+
+## Verification
+
+- `npm test`: HTTP regression checks for health, signal validation, risk calculations, routing and denied writes.
+- `npm run lint`: JavaScript syntax validation (not a full style/security linter).
+- `npm run healthcheck -- https://atlas-desk-gamma.vercel.app`: one-shot liveness and deployed-version check. Exits nonzero for version drift. This does not schedule monitoring.
+
+The health endpoint proves liveness only. `security_verified: false` and `live_market_data: false` explicitly report that neither AEGIS enforcement nor a live price provider is verified here. The legacy `watch` label is not heartbeat evidence. Signal endpoints analyze user-supplied, unverified candles and never send orders. Entry calculations are arithmetic scenarios, not risk-policy approval.
