@@ -111,5 +111,6 @@ window.addEventListener("paste",e=>{ const it=[...((e.clipboardData&&e.clipboard
 fetch("/api/health").then(r=>r.json()).then(j=>{ const fine=j.ok&&j.version==="atlas-3.1.0"&&j.watch==="24/7"; $("st").textContent=fine?"SECURE · "+j.version:"HOLD"; $("st").className=fine?"ok":"hold"; }).catch(()=>{$("st").textContent="HOLD";});
 renderRisk(); renderStrats(); renderStages(); renderPipe(); renderCards(A.qualitySetups()); renderBook();
 </script>
+<script type="module" src="/js/speed-insights.js"></script>
 </body>
 </html>
