@@ -3,6 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { engine: ENGINE } = require('../version.json');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,7 +17,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
-    version: 'atlas-3.1.0',
+    version: ENGINE,
     watch: '24/7',
     broker: false,
     environment: ENV,

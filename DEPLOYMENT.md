@@ -92,7 +92,7 @@ vercel rollback atlas-desk --to <deployment-id>
 ```json
 {
   "ok": true,
-  "version": "atlas-3.1.0",
+  "version": "atlas-3.0.0",
   "watch": "24/7",
   "broker": false,
   "environment": "production",
