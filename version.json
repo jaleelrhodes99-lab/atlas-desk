@@ -1,0 +1,4 @@
+{
+  "engine": "atlas-3.0.0",
+  "note": "Single source of truth for the Atlas engine version. Runtime code requires this file; static files are stamped from it by scripts/sync-version.js (npm run version:sync). GET /api/health must return this value."
+}

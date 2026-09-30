@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { engine: ENGINE } = require("../version.json");
 const MEM0 = "https://api.mem0.ai/v1";
 const WRITE_MAX = 2000;
 
@@ -142,7 +143,7 @@ module.exports = async (req, res) => {
       const data = await mem0("/memories/", "POST", {
         messages: [{ role: "user", content: text }],
         user_id: userId(),
-        metadata: { desk: "atlas", engine: "atlas-2.3.0", broker: false },
+        metadata: { desk: "atlas", engine: ENGINE, broker: false },
       });
       return json(res, 200, { ok: true, plugin, action, stored: data });
     }

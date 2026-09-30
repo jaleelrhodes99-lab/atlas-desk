@@ -34,7 +34,7 @@
   <header>
     <div id="st">checking…</div>
     <h1>ATLAS</h1>
-    <div class="sub">Two desks. Engine atlas-3.1.0. Structure only — never a broker.</div>
+    <div class="sub">Two desks. Engine atlas-3.0.0. Structure only — never a broker.</div>
   </header>
   <div class="grid">
     <a class="card" href="/control">
@@ -52,7 +52,7 @@
   <script>
     fetch("/api/health").then(r=>r.json()).then(j=>{
       const el=document.getElementById("st");
-      const fine=j.ok && j.version==="atlas-3.1.0" && j.watch==="24/7";
+      const fine=j.ok && j.version==="atlas-3.0.0" && j.watch==="24/7";
       el.textContent = fine ? "SECURE · "+j.version : "HOLD";
       el.style.color = fine ? "#7dffa6" : "#ffd27d";
     }).catch(()=>{ document.getElementById("st").textContent="HOLD"; });

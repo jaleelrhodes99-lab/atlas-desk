@@ -1,10 +1,12 @@
+const { engine: ENGINE } = require("../version.json");
+
 module.exports = (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
     ok: true,
-    version: "atlas-2.3.0",
-    engine: "atlas-2.3.0",
+    version: ENGINE,
+    engine: ENGINE,
     watch: "24/7",
     desk: "atlas",
     broker: false,

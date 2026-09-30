@@ -1,6 +1,6 @@
-/* Atlas Control 3.1 — operator fills. Never a broker. */
+/* Atlas Control 3.0 — operator fills. Never a broker. */
 (function (root) {
-  const ENGINE = "atlas-3.1.0";
+  const ENGINE = "atlas-3.0.0";
   const LOT_CAP = 2;
   const SCORE_MIN = 85;
   const RR_MIN = 2;

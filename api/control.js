@@ -1,3 +1,5 @@
+const { engine: ENGINE } = require("../version.json");
+
 const STEPS = [
   "SIGNAL",
   "VALIDATE_DATA",
@@ -23,7 +25,7 @@ module.exports = (req, res) => {
   if (req.method === "GET") {
     return res.status(200).json({
       ok: true,
-      engine: "atlas-3.0.0",
+      engine: ENGINE,
       broker: false,
       desk: "control",
       commands: [
@@ -50,7 +52,7 @@ module.exports = (req, res) => {
 
   return res.status(200).json({
     ok: true,
-    engine: "atlas-3.0.0",
+    engine: ENGINE,
     broker: false,
     action: "logged",
     send_order: false,
