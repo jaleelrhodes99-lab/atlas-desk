@@ -3,6 +3,18 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const AtlasSignal = require('../js/signal-engine.js');
+
+const MAX_CANDLES = 50000;
+const MAX_MTF_BARS = 120000;
+const extent = (arr) => AtlasSignal.extent(arr, 'close', 0);
+function validCandle(c) {
+  if (!c || typeof c !== 'object') return false;
+  const v = [c.open, c.high, c.low, c.close].map(Number);
+  if (!v.every(Number.isFinite)) return false;
+  [c.open, c.high, c.low, c.close] = v; // coerce numeric strings once
+  return c.high >= c.low;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +22,7 @@ const ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '12mb' }));
 
 // Health check endpoint (required by contract)
 app.get('/api/health', (req, res) => {
@@ -24,55 +36,69 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Signal app endpoints
+// Signal app endpoints (analysis only - this server is not a broker and never places orders)
 app.post('/api/signals/analyze', (req, res) => {
-  const { candles, symbol } = req.body;
-  
-  if (!candles || !Array.isArray(candles)) {
+  const { candles, symbol } = req.body || {};
+
+  if (!Array.isArray(candles) || candles.length === 0 || candles.length > MAX_CANDLES || !candles.every(validCandle)) {
     return res.status(400).json({ error: 'Invalid candles data' });
   }
-  
-  // Market structure analysis
-  const highs = candles.map(c => c.high);
-  const lows = candles.map(c => c.low);
-  const closes = candles.map(c => c.close);
-  
-  const currentHigh = Math.max(...highs);
-  const currentLow = Math.min(...lows);
-  const recentHigh = Math.max(...highs.slice(-20));
-  const recentLow = Math.min(...lows.slice(-20));
-  
+
+  // Market structure analysis (single-array scans: Math.max(...arr) throws RangeError on large inputs)
+  const all = extent(candles);
+  const recent = extent(candles.slice(-20));
+  const last = candles[candles.length - 1];
+  const prev = candles[candles.length - 2];
+
   res.json({
     symbol,
     marketStructure: {
-      breakoutHigh: recentHigh,
-      breakoutLow: recentLow,
-      resistance: currentHigh,
-      support: currentLow,
-      trend: closes[closes.length - 1] > closes[closes.length - 2] ? 'up' : 'down'
+      breakoutHigh: recent.hi,
+      breakoutLow: recent.lo,
+      resistance: all.hi,
+      support: all.lo,
+      // needs two candles; a single candle has no direction
+      trend: prev ? (last.close > prev.close ? 'up' : last.close < prev.close ? 'down' : 'flat') : 'unknown'
     },
     candlePatterns: identifyCandlePatterns(candles),
-    quality: 'ready_for_review'
+    quality: 'ready_for_review',
+    broker: false
   });
 });
 
+// Top-down multi-timeframe signals from a 5m history: Daily/4H bias -> 1H setup -> 15m/5m trigger.
+// Body: { symbol, candles5m: [{t|time, o|open, h|high, l|low, c|close}, ...] } oldest first, CLOSED bars only.
+app.post('/api/signals/mtf', (req, res) => {
+  const { symbol, candles5m } = req.body || {};
+  if (!Array.isArray(candles5m) || candles5m.length < 2000 || candles5m.length > MAX_MTF_BARS) {
+    return res.status(400).json({ error: 'candles5m must hold 2000..' + MAX_MTF_BARS + ' closed 5m bars' });
+  }
+  const out = AtlasSignal.analyze(symbol, candles5m, {});
+  res.json({ ...out, broker: false, sendOrder: 'DENIED', note: 'Structure signals for review. Not a broker, never places trades.' });
+});
+
 app.post('/api/signals/entry', (req, res) => {
-  const { pattern, riskPercent, accountSize } = req.body;
-  
-  const riskAmount = (riskPercent / 100) * accountSize;
-  const entryPrice = req.body.entryPrice || 0;
-  const stopLoss = req.body.stopLoss || 0;
-  const takeProfit = req.body.takeProfit || 0;
-  
+  const { riskPercent, accountSize } = req.body || {};
+  const num = (v) => (v === undefined || v === null || v === '' ? NaN : Number(v));
+  const entryPrice = num(req.body && req.body.entryPrice);
+  const stopLoss = num(req.body && req.body.stopLoss);
+  const takeProfit = num(req.body && req.body.takeProfit);
+  const risk = num(riskPercent);
+  const account = num(accountSize);
+
+  const riskAmount = Number.isFinite(risk) && Number.isFinite(account) && risk >= 0 && account >= 0 ? (risk / 100) * account : null;
+  // long or short: sign of (entry - stop) decides the side; a target on the wrong side is rejected, not shown as a negative R:R
+  const rr = AtlasSignal.riskReward(entryPrice, stopLoss, takeProfit, 0);
+
   res.json({
-    entry: entryPrice,
-    stopLoss,
-    takeProfit,
+    entry: Number.isFinite(entryPrice) ? entryPrice : 0,
+    stopLoss: Number.isFinite(stopLoss) ? stopLoss : 0,
+    takeProfit: Number.isFinite(takeProfit) ? takeProfit : 0,
     riskAmount,
-    riskReward: takeProfit > 0 && stopLoss > 0 
-      ? ((takeProfit - entryPrice) / (entryPrice - stopLoss)).toFixed(2)
-      : 'pending',
-    status: 'calculated'
+    side: rr ? rr.side : null,
+    riskReward: rr ? rr.rr.toFixed(2) : 'pending',
+    status: 'calculated',
+    broker: false
   });
 });
 
@@ -109,37 +135,46 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Atlas Desk running on http://localhost:${PORT} (${ENV})`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Atlas Desk running on http://localhost:${PORT} (${ENV})`);
+  });
+}
 
 function identifyCandlePatterns(candles) {
   const patterns = [];
-  
   if (candles.length < 2) return patterns;
-  
-  // Hammer pattern
+
   candles.forEach((candle, i) => {
     const body = Math.abs(candle.close - candle.open);
+    const range = candle.high - candle.low;
+    if (!(range > 0)) return;
     const lowerWick = Math.min(candle.open, candle.close) - candle.low;
     const upperWick = candle.high - Math.max(candle.open, candle.close);
-    
-    if (lowerWick > body * 2 && upperWick < body * 0.5) {
-      patterns.push({ type: 'hammer', index: i, strength: 'medium' });
+
+    // Hammer / pin bar: long lower wick, small body near the top, tiny upper wick
+    if (lowerWick >= body * 2 && lowerWick >= 0.5 * range && upperWick <= Math.max(body * 0.5, 0.1 * range)) {
+      patterns.push({ type: 'hammer', direction: 'bullish', index: i, strength: 'medium' });
     }
-    
-    // Engulfing pattern
+    // Shooting star / bearish pin: mirror image
+    if (upperWick >= body * 2 && upperWick >= 0.5 * range && lowerWick <= Math.max(body * 0.5, 0.1 * range)) {
+      patterns.push({ type: 'shooting-star', direction: 'bearish', index: i, strength: 'medium' });
+    }
+
+    // Engulfing: opposite colours and the body fully covers the previous body (size alone is not engulfing)
     if (i > 0) {
       const prev = candles[i - 1];
       const prevBody = Math.abs(prev.close - prev.open);
-      const currBody = Math.abs(candle.close - candle.open);
-      
-      if (currBody > prevBody * 1.5) {
-        patterns.push({ type: 'engulfing', index: i, strength: 'high' });
+      if (body > prevBody && prevBody > 0) {
+        if (prev.close < prev.open && candle.close > candle.open && candle.open <= prev.close && candle.close >= prev.open) {
+          patterns.push({ type: 'engulfing', direction: 'bullish', index: i, strength: 'high' });
+        } else if (prev.close > prev.open && candle.close < candle.open && candle.open >= prev.close && candle.close <= prev.open) {
+          patterns.push({ type: 'engulfing', direction: 'bearish', index: i, strength: 'high' });
+        }
       }
     }
   });
-  
+
   return patterns;
 }
 
