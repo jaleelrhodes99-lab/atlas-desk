@@ -74,7 +74,7 @@ function runSymbol(sym, bars, opts, from, to) {
       }
       const res = simulate(all, sg, i + 1, spread);
       if (!res) { e.reportOutcome(s.id, "skip", s.t); continue; }
-      trades.push({ sym, t: s.t, side: sg.side, tf: s.entryTf, setup: s.setup.src, score: s.score, rr: s.rr, trig: s.trigger[0], r: res.r, exit: res.exit, bars: res.i - i });
+      trades.push({ sym, t: s.t, side: sg.side, tf: s.entryTf, setup: s.setup.src, score: s.score, rr: s.rr, trig: s.trigger[0], r: res.r, exit: res.exit, bars: res.i - i, exitT: all[res.i].t + 300 });
       // engine stays "open" until the outcome time; feed outcome at the moment it resolves by deferring
       pending.push({ id: s.id, at: all[res.i].t + 300, result: res.exit === "tp" ? "tp" : "x", dirT: all[res.i].t + 300 });
     }

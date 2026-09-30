@@ -11,7 +11,7 @@
     "build:mobile": "echo 'Mobile build ready'",
     "build:desktop": "echo 'Desktop build ready'",
     "test": "node --test tests/*.test.js",
-    "lint": "node --check js/signal-engine.js && node --check api/server.js && node --check api/health.js && node --check api/control.js && node --check api/memory.js && node --check js/atlas-control.js && node --check tools/backtest.js && node --check tools/bias-eval.js",
+    "lint": "node --check js/signal-engine.js && node --check api/server.js && node --check api/health.js && node --check api/control.js && node --check api/memory.js && node --check js/atlas-control.js && node --check tools/backtest.js && node --check tools/bias-eval.js && node --check tools/walk-forward.js",
     "deploy": "vercel",
     "deploy:prod": "vercel --prod"
   },
