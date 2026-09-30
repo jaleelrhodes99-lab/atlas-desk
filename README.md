@@ -34,3 +34,22 @@ SIGNAL → validate data → market → spread → news → account → size →
 ## Residual
 
 Lab tape is not a live feed. Cards are a rubric on a dated sample, plus your chart screenshot. Profit is not guaranteed. Attackers are not "all blocked."
+
+## GitHub App + OpenAI issue triage scaffold
+
+This repo now includes an additive GitHub App webhook scaffold at `POST /api/github/webhook`.
+
+- Handles **issues only** events:
+  - `issues.opened`
+  - `issue_comment.created` (issue comments only, not PR comments)
+- Supports slash commands:
+  - `/triage`
+  - `/summarize`
+- Ignores bot events and duplicate deliveries (`x-github-delivery`)
+- Verifies webhook signatures using `X-Hub-Signature-256`
+- Uses GitHub App installation auth (`@octokit/auth-app`) and OpenAI `responses.create(...)`
+- Optional repo allowlist via `ALLOWED_REPOS`
+
+Service endpoints:
+- `GET /health` (service health)
+- `GET /api/health` (existing Atlas contract health)

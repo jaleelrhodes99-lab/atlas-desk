@@ -11,17 +11,22 @@
     "build:mobile": "echo 'Mobile build ready'",
     "build:desktop": "echo 'Desktop build ready'",
     "test": "echo 'Tests pass'",
+    "test:github-app": "node --test tests/github-app/*.test.js",
     "lint": "echo 'Lint pass'",
     "deploy": "vercel",
     "deploy:prod": "vercel --prod"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "@octokit/auth-app": "^8.0.1",
+    "@octokit/rest": "^22.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.4.0",
+    "openai": "^5.20.2"
   },
   "devDependencies": {
     "vercel": "^32.0.0"
